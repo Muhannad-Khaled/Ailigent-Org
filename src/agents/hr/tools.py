@@ -211,10 +211,46 @@ def get_job_positions() -> List[Dict[str, Any]]:
         return [{"error": str(e)}]
 
 
+@tool
+def get_employee_statistics(
+    department: Optional[str] = None,
+    job_title: Optional[str] = None
+) -> Dict[str, Any]:
+    """
+    Get employee statistics including total count and breakdown by department and job title.
+
+    Use this tool when the user asks about:
+    - Total number of employees
+    - How many employees are in a department
+    - Employee counts by job title
+    - Employee headcount or workforce statistics
+
+    Args:
+        department: Optional filter by department name (partial match, e.g., "professional service")
+        job_title: Optional filter by job title (partial match, e.g., "developer")
+
+    Returns:
+        Statistics including total employee count, counts by department, and counts by job title
+    """
+    try:
+        ops = _get_hr_ops()
+        stats = ops.get_employee_statistics(
+            department=department,
+            job_title=job_title
+        )
+
+        return stats
+
+    except Exception as e:
+        logger.error(f"Error getting employee statistics: {e}")
+        return {"error": str(e)}
+
+
 # Export all tools as a list
 hr_tools = [
     search_employees,
     get_employee_details,
+    get_employee_statistics,
     get_pending_leave_requests,
     get_leave_types,
     get_departments,

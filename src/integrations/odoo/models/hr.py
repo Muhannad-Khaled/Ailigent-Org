@@ -415,6 +415,87 @@ class HROperations:
             'records': attendance
         }
 
+    # ==================== Statistics Operations ====================
+
+    def get_employee_statistics(
+        self,
+        department: Optional[str] = None,
+        job_title: Optional[str] = None
+    ) -> Dict[str, Any]:
+        """
+        Get employee statistics including counts by department and job title.
+
+        Args:
+            department: Optional filter by department name (partial match)
+            job_title: Optional filter by job title (partial match)
+
+        Returns:
+            Dictionary with employee statistics
+        """
+        base_domain = [['active', '=', True]]
+
+        # Apply filters if provided
+        filter_domain = base_domain.copy()
+        if department:
+            filter_domain.append(['department_id.name', 'ilike', department])
+        if job_title:
+            filter_domain.append(['job_id.name', 'ilike', job_title])
+
+        # Get total count (with filters if any)
+        total_count = self.client.search_count('hr.employee', filter_domain)
+
+        # Get all departments with employee counts
+        departments = self.client.search_read(
+            'hr.department',
+            [],
+            fields=['id', 'name'],
+            order='name asc'
+        )
+
+        by_department = {}
+        for dept in departments:
+            dept_domain = base_domain.copy()
+            dept_domain.append(['department_id', '=', dept['id']])
+            if job_title:
+                dept_domain.append(['job_id.name', 'ilike', job_title])
+            count = self.client.search_count('hr.employee', dept_domain)
+            if count > 0:
+                by_department[dept['name']] = count
+
+        # Get all job positions with employee counts
+        jobs = self.client.search_read(
+            'hr.job',
+            [],
+            fields=['id', 'name'],
+            order='name asc'
+        )
+
+        by_job_title = {}
+        for job in jobs:
+            job_domain = base_domain.copy()
+            job_domain.append(['job_id', '=', job['id']])
+            if department:
+                job_domain.append(['department_id.name', 'ilike', department])
+            count = self.client.search_count('hr.employee', job_domain)
+            if count > 0:
+                by_job_title[job['name']] = count
+
+        result = {
+            'total_employees': total_count,
+            'by_department': by_department,
+            'by_job_title': by_job_title,
+        }
+
+        # Add filter info if filters were applied
+        if department or job_title:
+            result['filters_applied'] = {}
+            if department:
+                result['filters_applied']['department'] = department
+            if job_title:
+                result['filters_applied']['job_title'] = job_title
+
+        return result
+
     # ==================== Department Operations ====================
 
     def get_departments(self) -> List[Dict[str, Any]]:

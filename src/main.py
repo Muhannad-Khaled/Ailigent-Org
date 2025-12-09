@@ -18,6 +18,7 @@ from src.api.routes import (
     agents_router,
     contracts_router,
     hr_router,
+    finance_router,
     telegram_router
 )
 from src.api.routes.telegram import set_bot_manager
@@ -119,6 +120,7 @@ app.include_router(health_router)
 app.include_router(agents_router)
 app.include_router(contracts_router)
 app.include_router(hr_router)
+app.include_router(finance_router)
 app.include_router(telegram_router)
 
 

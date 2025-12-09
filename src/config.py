@@ -28,7 +28,7 @@ class Settings(BaseSettings):
 
     # Google AI Configuration
     google_api_key: str = ""
-    gemini_model: str = "gemini-2.0-flash"
+    gemini_model: str = "gemini-2.5-flash"
     gemini_temperature: float = 0.1
 
     # Telegram Configuration

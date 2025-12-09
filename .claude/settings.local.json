@@ -1,11 +1,7 @@
 {
   "permissions": {
     "allow": [
-      "WebSearch",
-      "Bash(dir /S /B)",
-      "Bash(dir:*)",
-      "WebFetch(domain:www.odoo.com)",
-      "WebFetch(domain:github.com)"
+      "Bash(xargs:*)"
     ],
     "deny": [],
     "ask": []
